@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "935224859697",
+    "firebase_url": "https://lavyn-4fa5c.firebaseio.com",
+    "project_id": "lavyn-4fa5c",
+    "storage_bucket": "lavyn-4fa5c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935224859697:android:c39bb617f1da6217848910",
+        "android_client_info": {
+          "package_name": "com.lavyn.lavyn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935224859697-re2koqc88uufcda4t50t87vb6j1443ch.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lavyn.lavyn",
+            "certificate_hash": "2fa2a4a8c4df4b4f2fe9a499abfa6a4ac74108be"
+          }
+        },
+        {
+          "client_id": "935224859697-ou9vnvniljjgk1sr4dc309i3tcp9uokj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzFxkbBtuOO0YunucJqSAPgA5E2my_zTk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935224859697-ou9vnvniljjgk1sr4dc309i3tcp9uokj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

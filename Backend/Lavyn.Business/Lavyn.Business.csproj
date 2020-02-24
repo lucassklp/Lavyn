@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Lavyn.Business</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Auto.Mapping" Version="0.0.4" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.1" />
+    <PackageReference Include="Rx.Http" Version="1.2.0" />
+    <PackageReference Include="System.Reactive.Core" Version="4.3.2" />
+    <PackageReference Include="System.Reactive.Interfaces" Version="4.3.2" />
+    <PackageReference Include="System.Reactive.Linq" Version="4.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lavyn.Core\Lavyn.Core.csproj" />
+    <ProjectReference Include="..\Lavyn.Domain\Lavyn.Domain.csproj" />
+    <ProjectReference Include="..\Lavyn.Persistence\Lavyn.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>

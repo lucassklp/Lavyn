@@ -1,0 +1,5 @@
+<ul>
+    <li *ngFor="let user of usersOnline" (click)="startChat(user)">
+        {{ user.name }}
+    </li>
+</ul>
