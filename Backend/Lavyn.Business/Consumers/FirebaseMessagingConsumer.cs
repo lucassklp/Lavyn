@@ -11,7 +11,6 @@ namespace Lavyn.Business.Consumers
     {
         public FirebaseMessagingConsumer(IConsumerConfiguration<RxConsumer> consumerConfiguration, IConfiguration configuration) : base(consumerConfiguration)
         {
-            consumerConfiguration.Http.BaseAddress = new Uri(@"https://fcm.googleapis.com/");
             consumerConfiguration.RequestInterceptors.Add(new FirebaseMessagingInterceptor(configuration));
         }
 

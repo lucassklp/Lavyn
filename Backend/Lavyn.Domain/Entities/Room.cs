@@ -7,6 +7,8 @@ namespace Lavyn.Domain.Entities
     {
         public long Id { get; set; }
         
+        public string Key { get; set; }
+
         public RoomType Type { get; set; }
         
         public List<UserHasRoom> Users { get; set; }

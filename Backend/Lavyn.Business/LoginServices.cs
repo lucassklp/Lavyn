@@ -11,7 +11,6 @@ namespace Lavyn.Business
     public class LoginServices
     {
         private UserRepository repository;
-
         public LoginServices(UserRepository repository)
         {
             this.repository = repository;
@@ -28,6 +27,12 @@ namespace Lavyn.Business
             {
                 throw new InvalidCredentialException(ex);
             }
+        }
+
+        public IObservable<User> SetOnline(User user, bool isOnline)
+        {
+            user.IsOnline = isOnline;
+            return this.repository.UpdateAsync(user);
         }
 
         public async Task<User> LoginAsync(ICredential credential) => Login(credential);

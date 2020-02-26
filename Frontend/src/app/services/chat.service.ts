@@ -33,4 +33,8 @@ export class ChatService {
   public onLeaveRoom(): Observable<User>{
     return this.signalR.listen<User>("leave-room");
   }
+
+  public getChatId(userId: number): Observable<number> {
+    return this.http.get<number>(`api/room/with-user/${userId}`);
+  }
 }

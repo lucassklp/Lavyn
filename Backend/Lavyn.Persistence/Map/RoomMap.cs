@@ -12,6 +12,7 @@ namespace Lavyn.Persistence.Map
 
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.Type);
+            builder.Property(x => x.Key).HasMaxLength(64);
             
             builder.HasMany(x => x.Messages)
                 .WithOne(x => x.Room)
@@ -23,6 +24,7 @@ namespace Lavyn.Persistence.Map
 
             builder.HasKey(x => x.Id);
             builder.HasIndex(x => x.Type);
+            builder.HasIndex(x => x.Key);
         }
     }
 }

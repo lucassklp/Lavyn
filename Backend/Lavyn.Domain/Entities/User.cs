@@ -13,13 +13,14 @@ namespace Lavyn.Domain.Entities
         
         public DateTime LastLogin { get; set; }
         
-        
         public virtual ICollection<UserHasRole> UserRoles { get; set; }
 
         public virtual IList<UserHasRoom> UserRooms { get; set; }
         
         public virtual IList<Message> SentMessages { get; set; }
         
+        public virtual IList<Token> Tokens { get; set; }
+
         #region ICredential Members
         public string Password { get; set; }
         public string Login => Email;

@@ -15,6 +15,7 @@ namespace Lavyn.Business
             services.AddMappers();
             services.AddTransient<LoginServices>();
             services.AddTransient<UserServices>();
+            services.AddTransient<RoomServices>();
 
             services.AddTransient<AuthenticatedUserProvider>();
             services.AddTransient(x => x.GetService<AuthenticatedUserProvider>().GetAuthenticatedUser());

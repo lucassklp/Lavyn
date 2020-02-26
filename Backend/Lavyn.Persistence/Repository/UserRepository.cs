@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Lavyn.Core;
 using Lavyn.Domain;
 using Lavyn.Domain.Entities;
+using Lavyn.Domain.Entities.Enums;
 
 namespace Lavyn.Persistence.Repository
 {
@@ -17,7 +18,7 @@ namespace Lavyn.Persistence.Repository
 
         public bool IsRegistred(User user)
         {
-            return Set().Any(x => x.Email == user.Email);
+            return Query().Any(x => x.Email == user.Email);
         }
 
         public IObservable<bool> IsRegistredAsync(User user)
@@ -27,12 +28,21 @@ namespace Lavyn.Persistence.Repository
 
         public User Login(ICredential credential)
         {
-            return Set()
+            return Query()
                 .Include(u => u.UserRoles)
                     .ThenInclude(userRoles => userRoles.Role)
                 .Single(x => x.Email.Equals(credential.Login) && x.Password.Equals(credential.Password));
         }
 
+        public List<User> GetUsersByRoom(long roomId) => Query<UserHasRoom>()
+            .Where(x => x.RoomId == roomId)
+            .Select(x => x.User)
+            .ToList();
+
+        public Token GetToken(long userId, TokenType type)
+        {
+            return Query<Token>().Where(x => x.UserId == userId && x.Type == type).FirstOrDefault();
+        }
 
         public IObservable<User> LoginAsync(ICredential credential)
         {
@@ -41,7 +51,7 @@ namespace Lavyn.Persistence.Repository
 
         public async Task<List<User>> GetOnlineUsers()
         {
-            return await Set().Where(x => x.IsOnline)
+            return await Query().Where(x => x.IsOnline)
                 .OrderByDescending(x => x.LastLogin)
                 .Select(x => new User()
                 {

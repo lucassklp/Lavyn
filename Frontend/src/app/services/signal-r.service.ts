@@ -16,10 +16,7 @@ export class SignalRService {
   public connect(channel: string): Observable<void> {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`http://localhost:5000/${channel}`, {
-        accessTokenFactory: () => {
-          this.authService.user;
-          return this.authService.token
-        }
+        accessTokenFactory: () => this.authService.token
       })
       .build();
 

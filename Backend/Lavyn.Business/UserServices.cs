@@ -12,15 +12,14 @@ using Lavyn.Persistence.Repository;
 
 namespace Lavyn.Business
 {
-    public class UserServices
+    public class UserServices : AbstractServices<User>
     {
-        UserRepository userRepository;
-        Crud<long, User> crud;
+        private UserRepository userRepository;
         private IMapResolver mapResolver;
-        public UserServices(UserRepository userRepository, Crud<long, User> crud, IMapResolver mapResolver)
+        public UserServices(UserRepository userRepository, IMapResolver mapResolver)
+            : base(userRepository)
         {
             this.userRepository = userRepository;
-            this.crud = crud;
             this.mapResolver = mapResolver;
         }
 
@@ -29,8 +28,6 @@ namespace Lavyn.Business
             return (await userRepository.GetOnlineUsers()).Select(x => mapResolver.Map<User, UserDto>(x)).ToList();
         }
         
-        
-        
         public IObservable<User> RegisterAsync(User user)
         {
             return userRepository.IsRegistredAsync(user).Select(isRegistred =>
@@ -38,7 +35,7 @@ namespace Lavyn.Business
                 if (!isRegistred)
                 {
                     user.Password = user.Password.ToSha512();
-                    return this.crud.Create(user);
+                    return this.Repository.Create(user);
                 }
                 else
                 {
