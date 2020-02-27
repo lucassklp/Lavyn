@@ -21,7 +21,10 @@ namespace Lavyn.Business
             credential.Password = credential.Password.ToSha512();
             try
             {
-                return repository.Login(credential);
+                var user = repository.Login(credential);
+                user.LastLogin = DateTime.Now;
+                repository.UpdateAsync(user).Subscribe();
+                return user;
             }
             catch(InvalidOperationException ex)
             {

@@ -35,7 +35,7 @@ namespace Lavyn.Business
             {
                 Date = DateTime.Now,
                 Content = messageDto.Message,
-                RoomId = messageDto.ChatId,
+                RoomId = messageDto.RoomId,
                 SenderId = authenticatedUser.Id
             };
             

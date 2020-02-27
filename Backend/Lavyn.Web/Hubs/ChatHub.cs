@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Auto.Mapping.DependencyInjection;
-using Lavyn.Business;
 using Lavyn.Business.Mapping;
 using Lavyn.Domain.Dtos;
 using Lavyn.Domain.Entities;
@@ -18,19 +17,23 @@ namespace Lavyn.Web.Hubs
         private ILogger<ChatHub> _logger;
         private User _authenticatedUser;
         private IMapResolver _mapResolver;
-
-        private Crud<long, User> _crudUser;
+        private UserRepository _userRepository;
+        private RoomRepository _roomRepository;
+        private MessageRepository _messageRepository;
         public ChatHub(
             ILogger<ChatHub> logger,
             User authenticatedUser,
             IMapResolver mapResolver,
-            Crud<long, User> crudUser)
+            UserRepository userRepository,
+            RoomRepository roomRepository,
+            MessageRepository messageRepository)
         {
             _logger = logger;
             _authenticatedUser = authenticatedUser;
             _mapResolver = mapResolver;
-            _crudUser = crudUser;
-
+            _userRepository = userRepository;
+            _roomRepository = roomRepository;
+            _messageRepository = messageRepository;
         }
         
         public override Task OnConnectedAsync()
@@ -38,8 +41,15 @@ namespace Lavyn.Web.Hubs
             _logger.LogInformation($"{_authenticatedUser.Name} has been connected");
             
             _authenticatedUser.IsOnline = true;
-            _crudUser.UpdateAsync(_authenticatedUser).Subscribe();
+            _userRepository.Update(_authenticatedUser);
             
+            var rooms = _roomRepository.GetGroupsIdByUser(_authenticatedUser.Id);
+
+            foreach (var room in rooms)
+            {
+                Groups.AddToGroupAsync(Context.ConnectionId, room);
+            }
+
             Clients.Others.SendAsync("enter-room", new UserToUserDtoMapping().Map(_authenticatedUser));
             return base.OnConnectedAsync();
         }
@@ -49,16 +59,34 @@ namespace Lavyn.Web.Hubs
             _logger.LogInformation($"{_authenticatedUser.Name} has been disconnected");
 
             _authenticatedUser.IsOnline = false;
-            _crudUser.UpdateAsync(_authenticatedUser).Subscribe();
+            _userRepository.UpdateAsync(_authenticatedUser).Subscribe();
+
+            var rooms = _roomRepository.GetGroupsIdByUser(_authenticatedUser.Id);
+
+            foreach (var room in rooms)
+            {
+                Groups.RemoveFromGroupAsync(Context.ConnectionId, room);
+            }
 
             Clients.Others.SendAsync("leave-room", new UserToUserDtoMapping().Map(_authenticatedUser));
             return base.OnDisconnectedAsync(exception);
         }
 
         [HubMethodName("send-message")]
-        public async Task SendMessage(ChatMessageDto chat)
+        public Task SendMessage(ChatMessageDto chat)
         {
-             await Clients.Others.SendAsync("ReceiveMsg", chat);
+            var message = new Message()
+            {
+                SenderId = _authenticatedUser.Id,
+                RoomId = chat.RoomId,
+                Date = DateTime.Now,
+                Content = chat.Message
+            };
+
+            _messageRepository.CreateAsync(message).Subscribe();
+
+            return Clients.OthersInGroup(chat.RoomId.ToString())
+                .SendAsync("received-message", chat);
         }
     }
 }

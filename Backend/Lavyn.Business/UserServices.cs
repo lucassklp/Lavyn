@@ -9,6 +9,7 @@ using Lavyn.Business.Exceptions;
 using Lavyn.Domain.Dtos;
 using Lavyn.Domain.Entities;
 using Lavyn.Persistence.Repository;
+using Lavyn.Business.Mapping;
 
 namespace Lavyn.Business
 {
@@ -23,9 +24,11 @@ namespace Lavyn.Business
             this.mapResolver = mapResolver;
         }
 
-        public async Task<List<UserDto>> GetOnlineUsers()
+        public List<UserDto> GetOnlineUsers()
         {
-            return (await userRepository.GetOnlineUsers()).Select(x => mapResolver.Map<User, UserDto>(x)).ToList();
+            return userRepository.GetOnlineUsers()
+                .Select(x => new UserToUserDtoMapping().Map(x))
+                .ToList();
         }
         
         public IObservable<User> RegisterAsync(User user)

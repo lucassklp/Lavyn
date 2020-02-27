@@ -49,9 +49,9 @@ namespace Lavyn.Persistence.Repository
             return SingleObservable.Create(() => Login(credential));
         }
 
-        public async Task<List<User>> GetOnlineUsers()
+        public List<User> GetOnlineUsers()
         {
-            return await Query().Where(x => x.IsOnline)
+            return Query().Where(x => x.IsOnline)
                 .OrderByDescending(x => x.LastLogin)
                 .Select(x => new User()
                 {
@@ -60,7 +60,7 @@ namespace Lavyn.Persistence.Repository
                     Name = x.Name,
                     IsOnline = x.IsOnline
                 })
-                .ToListAsync();
+                .ToList();
         }
     }
 }

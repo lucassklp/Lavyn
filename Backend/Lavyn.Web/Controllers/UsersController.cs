@@ -17,9 +17,9 @@ namespace Lavyn.Web.Controllers
         
         [HttpGet]
         [Route("online")]
-        public async Task<IActionResult> GetOnlineUsers()
+        public IActionResult GetOnlineUsers()
         {
-            return Ok(await userServices.GetOnlineUsers());
+            return Ok(userServices.GetOnlineUsers());
         }
     }
 }
