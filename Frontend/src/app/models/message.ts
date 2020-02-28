@@ -1,4 +1,5 @@
 export class Message {
-    username: string;
     message: string;
+    date: Date;
+    senderId: number;
 }

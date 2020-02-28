@@ -1,8 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ChatService } from 'src/app/services/chat.service';
-import { Observable } from 'rxjs';
 import { User } from 'src/app/models/user';
 import { Message } from 'src/app/models/message';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { RoomMessage } from 'src/app/models/room-message';
 
 @Component({
   selector: 'app-chat',
@@ -12,20 +13,25 @@ import { Message } from 'src/app/models/message';
 export class ChatComponent implements OnInit {
 
   usersOnline: User[] = [];
+  form: FormGroup;
+  currentRoomId: number;
+  talks: {[roomId: number]: Message[]};
 
-  currentUserTalk: User;
-
-  constructor(private chatService: ChatService, private change: ChangeDetectorRef) { }
+  constructor(private chatService: ChatService, private change: ChangeDetectorRef, private fb: FormBuilder) {
+    this.form = fb.group({
+      message: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
-    // this.chatService.getUsersOnline().subscribe(users => {
-    //   this.usersOnline = users;
-    // });
+    this.chatService.getUsersOnline().subscribe(users => {
+      this.usersOnline = users;
+    });
 
     this.chatService.onEnterRoom().subscribe(user => {
       this.usersOnline.unshift(user);
-      console.log(user);
       this.change.detectChanges();
+      this.getChat(user.id);
     });
 
     this.chatService.onLeaveRoom().subscribe(user => {
@@ -33,25 +39,36 @@ export class ChatComponent implements OnInit {
       if (index > -1) {
         this.usersOnline.splice(index, 1);
       }
-      console.log(user);
       this.change.detectChanges();
     });
+
+    this.chatService.listen().subscribe(receivedMsg => this.putMessage(receivedMsg.roomId, receivedMsg));
+  }
+
+  private putMessage(roomId: number, receivedMsg: Message) {
+    const talk = this.talks[roomId];
+    if (talk) {
+      talk.push(receivedMsg);
+    } else {
+      this.talks[roomId] = [receivedMsg];
+    }
   }
 
   getChat(userId: number) {
-    this.chatService.getChatId(userId).subscribe(id => console.log(id));
+    this.chatService.getChatWith(userId).subscribe(talk => {
+      this.currentRoomId = talk.roomId;
+      for (const message of talk.messages) {
+        this.putMessage(talk.roomId, message);
+      }
+    });
   }
 
-  startChat(user: User){
-    this.currentUserTalk = user;
-    console.log(user);
-    this.getChat(user.id);
-  }
-
-  sendMessage(){
-    const msg = new Message();
-    msg.message = "hello"
-    this.chatService.sendMessage(msg);
+  sendMessage() {
+    const msg = new RoomMessage();
+    msg.roomId = this.currentRoomId;
+    msg.message = this.form.controls.message.value as string;
+    this.chatService.sendMessage(msg).subscribe();
+    this.form.controls.message.setValue('');
   }
 
 }
