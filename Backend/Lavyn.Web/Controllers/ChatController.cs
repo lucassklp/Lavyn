@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Lavyn.Web.Controllers
 {
-    [Route("api/room")]
-    public class RoomController : Controller
+    [Route("api/chat")]
+    public class ChatController : Controller
     {
         private RoomServices roomServices;
-        public RoomController(RoomServices roomServices)
+        public ChatController(RoomServices roomServices)
         {
             this.roomServices = roomServices;
         }
