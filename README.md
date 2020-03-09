@@ -1,6 +1,6 @@
-# Default.Architecture
+# Lavyn
 
-A open-source web api starter project with authentication/authorization made with Docker, Angular 9, ASP.Net Core 3.1 (JWT) and MySQL.
+A open-source chat with authentication/authorization made with Docker, Angular 9, ASP.Net Core 3.1, SignalR (socket), Peerjs (WebRTC) and MySQL.
 
 ## Running
 
