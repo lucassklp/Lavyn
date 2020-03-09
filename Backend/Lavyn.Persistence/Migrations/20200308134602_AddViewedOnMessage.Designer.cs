@@ -3,14 +3,16 @@ using System;
 using Lavyn.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Lavyn.Persistence.Migrations
 {
     [DbContext(typeof(DaoContext))]
-    partial class DaoContextModelSnapshot : ModelSnapshot
+    [Migration("20200308134602_AddViewedOnMessage")]
+    partial class AddViewedOnMessage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,6 +41,10 @@ namespace Lavyn.Persistence.Migrations
                     b.Property<long>("SenderId")
                         .HasColumnName("sender_id")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("Viewed")
+                        .HasColumnName("viewed")
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id")
                         .HasName("pk_messages");
@@ -124,8 +130,8 @@ namespace Lavyn.Persistence.Migrations
 
                     b.Property<string>("Value")
                         .HasColumnName("value")
-                        .HasColumnType("varchar(500) CHARACTER SET utf8mb4")
-                        .HasMaxLength(500);
+                        .HasColumnType("varchar(150) CHARACTER SET utf8mb4")
+                        .HasMaxLength(150);
 
                     b.HasKey("Id")
                         .HasName("pk_tokens");
@@ -203,10 +209,6 @@ namespace Lavyn.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id")
                         .HasColumnType("bigint");
-
-                    b.Property<DateTime>("LastSeen")
-                        .HasColumnName("last_seen")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<long>("RoomId")
                         .HasColumnName("room_id")

@@ -23,13 +23,6 @@ namespace Lavyn.Business
             this.userRepository = userRepository;
             this.mapResolver = mapResolver;
         }
-
-        public List<UserDto> GetOnlineUsers()
-        {
-            return userRepository.GetOnlineUsers()
-                .Select(x => new UserToUserDtoMapping().Map(x))
-                .ToList();
-        }
         
         public IObservable<User> RegisterAsync(User user)
         {

@@ -1,3 +1,5 @@
+using System;
+
 namespace Lavyn.Domain.Entities
 {
     public class UserHasRoom : Identifiable<long>
@@ -8,5 +10,7 @@ namespace Lavyn.Domain.Entities
         
         public long UserId { get; set; }
         public User User { get; set; }
+        
+        public DateTime LastSeen { get; set; }
     }
 }

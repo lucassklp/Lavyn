@@ -17,48 +17,74 @@ namespace Lavyn.Business
     {
         private RoomRepository roomRepository;
         private User authenticatedUser;
-        public RoomServices(RoomRepository roomRepository, User authenticatedUser)
+        private IMapResolver mapResolver;
+        private Crud<long, UserHasRoom> crudUserhasRoom;
+        public RoomServices(
+            RoomRepository roomRepository, 
+            User authenticatedUser,
+            IMapResolver mapResolver,
+            Crud<long, UserHasRoom> crudUserhasRoom)
             : base(roomRepository)
         {
             this.roomRepository = roomRepository;
             this.authenticatedUser = authenticatedUser;
+            this.mapResolver = mapResolver;
+            this.crudUserhasRoom = crudUserhasRoom;
         }
 
         private string GenerateKey(params long[] ids)
         {
             Array.Sort(ids);
-            return string.Concat(ids, '_').ToSha256();
+            return string.Join('_', ids).ToSha256();
         }
 
-        public long GetChatId(long userId)
+        private RoomDto ConvertToDto(Room room)
         {
-            var room = this.roomRepository.GetRoomByUsers(RoomType.Individual, GenerateKey(this.authenticatedUser.Id, userId));
-
-            if(room == null)
+            var roomDto = mapResolver.Map<Room, RoomDto>(room);
+            if (room.Type == RoomType.Individual)
             {
-                room = new Room()
-                {
-                    Type = RoomType.Individual,
-                    Key = GenerateKey(this.authenticatedUser.Id, userId),
-                    Users = new System.Collections.Generic.List<UserHasRoom>()
-                    {
-                        new UserHasRoom()
-                        {
-                            UserId = authenticatedUser.Id
-                        },
-                        new UserHasRoom()
-                        {
-                            UserId = userId
-                        }
-                    }
-                };
-
-                roomRepository.Create(room);
-
-                return room.Id;
+                roomDto.Name = room.UserHasRoom.Select(x => x.User)
+                    .FirstOrDefault(x => x.Id != authenticatedUser.Id)?.Name;
             }
 
-            return room.Id;
+            return roomDto;
+        }
+
+        public List<RoomDto> GetRoomsAuthenticatedUser()
+        {
+            return roomRepository.GetRoomsByUserId(authenticatedUser.Id)
+                .Select(room => ConvertToDto(room))
+                .ToList();
+        }
+        
+        public async Task<RoomDto> GetOrCreateRoomWith(params long[] userIds)
+        {
+            var ids = userIds.ToList();
+            ids.Add(authenticatedUser.Id);
+
+            var key = GenerateKey(ids.ToArray());
+            var room = roomRepository.GetRoomByKey(key);
+
+            if (room != null) 
+                return ConvertToDto(room);
+            
+            room = new Room()
+            {
+                Type = ids.Count > 2 ? RoomType.Group : RoomType.Individual,
+                Key = key,
+                UserHasRoom = ids.Select(id => new UserHasRoom { UserId = id }).ToList()
+            };
+
+            roomRepository.Create(room);
+            
+            return ConvertToDto(room);
+        }
+
+        public async Task<UserHasRoom> SetLastViewedRoom(string roomKey)
+        {
+            var userHasRoom = roomRepository.GetUserHasRoomByUserAndKey(authenticatedUser.Id, roomKey);
+            userHasRoom.LastSeen = DateTime.Now;
+            return await crudUserhasRoom.UpdateAsync(userHasRoom);
         }
     }
 }

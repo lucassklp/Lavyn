@@ -9,7 +9,7 @@ namespace Lavyn.Business.Consumers
 {
     public class FirebaseMessagingConsumer : RxConsumer
     {
-        public FirebaseMessagingConsumer(IConsumerConfiguration<RxConsumer> consumerConfiguration, IConfiguration configuration) : base(consumerConfiguration)
+        public FirebaseMessagingConsumer(IConsumerConfiguration<FirebaseMessagingConsumer> consumerConfiguration, IConfiguration configuration) : base(consumerConfiguration)
         {
             consumerConfiguration.RequestInterceptors.Add(new FirebaseMessagingInterceptor(configuration));
         }

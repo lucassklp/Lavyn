@@ -14,12 +14,5 @@ namespace Lavyn.Web.Controllers
         {
             this.userServices = userServices;
         }
-        
-        [HttpGet]
-        [Route("online")]
-        public IActionResult GetOnlineUsers()
-        {
-            return Ok(userServices.GetOnlineUsers());
-        }
     }
 }

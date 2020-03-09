@@ -11,8 +11,11 @@ namespace Lavyn.Business.Mapping
         public static IServiceCollection AddMappers(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddAutoMapping();
-            serviceCollection.AddAutoMapper<IMapper<User, UserDto>, UserToUserDtoMapping>();
-    
+            serviceCollection.AddTransient<IMapper<User, UserDto>, UserToUserDtoMapping>();
+            serviceCollection.AddTransient<IMapper<Room, RoomDto>, RoomToRoomDtoMapping>();
+            serviceCollection.AddTransient<IMapper<Message, MessageDto>, MessageToMessageDtoMapping>();
+            serviceCollection.AddTransient<IMapper<UserHasRoom, ViewedMessageDto>, UserHasRoomToViewedMessageDto>();
+            
             return serviceCollection;
         }
     }

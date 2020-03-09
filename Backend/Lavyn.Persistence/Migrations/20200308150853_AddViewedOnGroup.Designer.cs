@@ -3,14 +3,16 @@ using System;
 using Lavyn.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Lavyn.Persistence.Migrations
 {
     [DbContext(typeof(DaoContext))]
-    partial class DaoContextModelSnapshot : ModelSnapshot
+    [Migration("20200308150853_AddViewedOnGroup")]
+    partial class AddViewedOnGroup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,8 +126,8 @@ namespace Lavyn.Persistence.Migrations
 
                     b.Property<string>("Value")
                         .HasColumnName("value")
-                        .HasColumnType("varchar(500) CHARACTER SET utf8mb4")
-                        .HasMaxLength(500);
+                        .HasColumnType("varchar(150) CHARACTER SET utf8mb4")
+                        .HasMaxLength(150);
 
                     b.HasKey("Id")
                         .HasName("pk_tokens");

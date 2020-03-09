@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Lavyn.Persistence\Lavyn.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="CallServices.cs" />
+  </ItemGroup>
+
 </Project>

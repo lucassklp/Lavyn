@@ -13,9 +13,10 @@ namespace Lavyn.Persistence.Map
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.RoomId);
             builder.Property(x => x.UserId);
+            builder.Property(x => x.LastSeen);
 
             builder.HasOne(x => x.Room)
-                .WithMany(x => x.Users)
+                .WithMany(x => x.UserHasRoom)
                 .HasForeignKey(x => x.RoomId);
             
             builder.HasOne(x => x.User)

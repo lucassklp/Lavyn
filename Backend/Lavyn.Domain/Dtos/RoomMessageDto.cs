@@ -1,7 +1,7 @@
 namespace Lavyn.Domain.Dtos
 {
-    public class RoomMessageDto
+    public class RoomMessageDto : MessageDto
     {
-        
+        public string RoomKey { get; set; }
     }
 }

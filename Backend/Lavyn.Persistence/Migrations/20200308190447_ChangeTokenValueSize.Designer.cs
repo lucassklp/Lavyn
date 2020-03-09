@@ -3,14 +3,16 @@ using System;
 using Lavyn.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Lavyn.Persistence.Migrations
 {
     [DbContext(typeof(DaoContext))]
-    partial class DaoContextModelSnapshot : ModelSnapshot
+    [Migration("20200308190447_ChangeTokenValueSize")]
+    partial class ChangeTokenValueSize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

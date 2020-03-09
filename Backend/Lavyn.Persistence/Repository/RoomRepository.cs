@@ -4,6 +4,7 @@ using Lavyn.Domain.Entities.Enums;
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using Lavyn.Domain.Dtos;
 
 namespace Lavyn.Persistence.Repository
 {
@@ -13,18 +14,32 @@ namespace Lavyn.Persistence.Repository
         {
         }
 
-        public Room GetRoomByUsers(RoomType roomType, string key)
+        public Room GetRoomByKey(string key)
         {
             return Query()
-                .Where(x => x.Type == roomType && x.Key == key)
-                .FirstOrDefault();
+                .Include(x => x.UserHasRoom)
+                    .ThenInclude(x => x.User)
+                        .ThenInclude(x => x.Tokens)
+                .Include(x => x.UserHasRoom)
+                    .ThenInclude(x => x.Room)
+                .FirstOrDefault(x => x.Key == key);
         }
-
-        public List<string> GetGroupsIdByUser(long userId)
+        
+        public List<Room> GetRoomsByUserId(long userId)
         {
             return Query<UserHasRoom>().Where(x => x.UserId == userId)
-                .Select(x => x.Room.Id.ToString())
+                .Include(x => x.Room)
+                    .ThenInclude(x => x.UserHasRoom)
+                        .ThenInclude(x => x.User)
+                .Include(x => x.Room.Messages)
+                .Select(x => x.Room)
+                .OrderByDescending(x => x.LastMessageDate)
                 .ToList();
+        }
+
+        public UserHasRoom GetUserHasRoomByUserAndKey(long userId, string roomKey)
+        {
+            return Query<UserHasRoom>().SingleOrDefault(x => x.Room.Key == roomKey && x.UserId == userId);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Lavyn.Persistence.Map
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.Type);
             builder.Property(x => x.UserId);
-            builder.Property(x => x.Value).HasMaxLength(150);
+            builder.Property(x => x.Value).HasMaxLength(500);
 
             builder.HasOne(x => x.User)
                 .WithMany(x => x.Tokens)

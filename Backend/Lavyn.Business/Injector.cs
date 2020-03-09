@@ -1,4 +1,5 @@
-﻿using Lavyn.Business.Mapping;
+﻿using Lavyn.Business.Consumers;
+using Lavyn.Business.Mapping;
 using Lavyn.Business.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Lavyn.Persistence.Repository;
@@ -13,9 +14,11 @@ namespace Lavyn.Business
             services.AddRepository();
             services.AddValidators();
             services.AddMappers();
+            services.AddConsumers();
             services.AddTransient<LoginServices>();
             services.AddTransient<UserServices>();
             services.AddTransient<RoomServices>();
+            services.AddTransient<ChatServices>();
 
             services.AddTransient<AuthenticatedUserProvider>();
             services.AddTransient(x => x.GetService<AuthenticatedUserProvider>().GetAuthenticatedUser());

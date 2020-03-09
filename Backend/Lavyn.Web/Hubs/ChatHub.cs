@@ -1,92 +1,103 @@
 using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Auto.Mapping.DependencyInjection;
-using Lavyn.Business.Mapping;
+using Lavyn.Business;
 using Lavyn.Domain.Dtos;
 using Lavyn.Domain.Entities;
-using Lavyn.Persistence.Repository;
+using Lavyn.Domain.Entities.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
 
 namespace Lavyn.Web.Hubs
 {
     [Authorize]
     public class ChatHub : Hub
     {
-        private ILogger<ChatHub> _logger;
+        private ChatServices _chatServices;
+        private RoomServices _roomServices;
         private User _authenticatedUser;
-        private IMapResolver _mapResolver;
-        private UserRepository _userRepository;
-        private RoomRepository _roomRepository;
-        private MessageRepository _messageRepository;
-        public ChatHub(
-            ILogger<ChatHub> logger,
-            User authenticatedUser,
-            IMapResolver mapResolver,
-            UserRepository userRepository,
-            RoomRepository roomRepository,
-            MessageRepository messageRepository)
+        public ChatHub(ChatServices chatServices, RoomServices roomServices, User authenticatedUser)
         {
-            _logger = logger;
+            _chatServices = chatServices;
+            _roomServices = roomServices;
             _authenticatedUser = authenticatedUser;
-            _mapResolver = mapResolver;
-            _userRepository = userRepository;
-            _roomRepository = roomRepository;
-            _messageRepository = messageRepository;
         }
         
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
-            _logger.LogInformation($"{_authenticatedUser.Name} has been connected");
-            
-            _authenticatedUser.IsOnline = true;
-            _userRepository.Update(_authenticatedUser);
-            
-            var rooms = _roomRepository.GetGroupsIdByUser(_authenticatedUser.Id);
+            var user = await _chatServices.SetAuthenticatedUserOnline(true);
+            var rooms = _roomServices.GetRoomsAuthenticatedUser();
 
             foreach (var room in rooms)
             {
-                Groups.AddToGroupAsync(Context.ConnectionId, room);
+                await Groups.AddToGroupAsync(Context.ConnectionId, room.Key);
+                await Clients.OthersInGroup(room.Key).SendAsync("enter-room", new UserInRoomDto
+                {
+                    UserId = user.Id,
+                    RoomKey = room.Key
+                });
             }
-
-            Clients.Others.SendAsync("enter-room", new UserToUserDtoMapping().Map(_authenticatedUser));
-            return base.OnConnectedAsync();
+            
+            await Clients.Caller.SendAsync("my-rooms", rooms);
+            await base.OnConnectedAsync();
         }
 
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
-            _logger.LogInformation($"{_authenticatedUser.Name} has been disconnected");
-
-            _authenticatedUser.IsOnline = false;
-            _userRepository.UpdateAsync(_authenticatedUser).Subscribe();
-
-            var rooms = _roomRepository.GetGroupsIdByUser(_authenticatedUser.Id);
+            var user = await _chatServices.SetAuthenticatedUserOnline(false);
+            var rooms = _roomServices.GetRoomsAuthenticatedUser();
 
             foreach (var room in rooms)
             {
-                Groups.RemoveFromGroupAsync(Context.ConnectionId, room);
+                await Clients.OthersInGroup(room.Key).SendAsync("leave-room", new UserInRoomDto
+                {
+                    UserId = user.Id,
+                    RoomKey = room.Key
+                });
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.Key);
             }
+            
+            await base.OnDisconnectedAsync(exception);
+        }
 
-            Clients.Others.SendAsync("leave-room", new UserToUserDtoMapping().Map(_authenticatedUser));
-            return base.OnDisconnectedAsync(exception);
+        [HubMethodName("viewed-room")]
+        public async Task ViewedMessages(string roomKey)
+        {
+            var userHasRoom = await _roomServices.SetLastViewedRoom(roomKey);
+            await Clients.Group(roomKey).SendAsync("viewed-room", new ViewedMessageDto()
+            {
+                LastSeen = userHasRoom.LastSeen,
+                RoomKey = roomKey,
+                UserId = userHasRoom.UserId
+            });
         }
 
         [HubMethodName("send-message")]
-        public Task SendMessage(ChatMessageDto chat)
+        public async Task SendMessage(ChatMessageDto chat)
         {
-            var message = new Message()
-            {
-                SenderId = _authenticatedUser.Id,
-                RoomId = chat.RoomId,
-                Date = DateTime.Now,
-                Content = chat.Message
-            };
+            _chatServices.SendMessageAsync(chat).Subscribe();
+            await Clients.Group(chat.RoomKey)
+                .SendAsync("received-message", new RoomMessageDto
+                {
+                    Date = DateTime.Now,
+                    Message = chat.Message,
+                    SenderId = _authenticatedUser.Id,
+                    RoomKey = chat.RoomKey
+                });
+            await ViewedMessages(chat.RoomKey);
+        }
 
-            _messageRepository.CreateAsync(message).Subscribe();
-
-            return Clients.OthersInGroup(chat.RoomId.ToString())
-                .SendAsync("received-message", chat);
+        [HubMethodName("connect-call")]
+        public async Task Call(CallDto call)
+        {
+            var token = _chatServices.CreateCallToken(call);
+            await Clients.Group(call.Key)
+                .SendAsync("call", new CallDto()
+                {
+                    CallType = call.CallType,
+                    Key = token,
+                    CallerId = _authenticatedUser.Id
+                });
         }
     }
 }
