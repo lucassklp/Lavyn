@@ -3,7 +3,7 @@
 A open-source chat featured with text, image, audio, screensharing and video calls and much more!
 
 
-The application is made of:
+The application is made using:
 - Docker
 - Angular 9
 - ASP.Net Core 3.1
