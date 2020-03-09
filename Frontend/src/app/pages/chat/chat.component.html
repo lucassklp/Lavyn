@@ -1,24 +1,52 @@
 <div class="container">
     <div class="row">
         <div class="col-4">
-            <ul class="list-group">
-                <li class="list-group-item" *ngFor="let user of usersOnline" (click)="getChat(user.id)">
-                    <img ngxGravatar [email]="'simas.lucas@hotmail.com'">
-                    {{ user.name }}
+            <ul class="list-group chats">
+                <li class="list-group-item room-block" *ngFor="let room of getRooms()" (click)="selectRoom(room)">
+                    <div class="float-left">
+                        <div class="profile-pic">
+                            <img ngxGravatar email="simas.lucas@hotmail.com">
+                            <div class="status" [ngClass]="{'online': isEveryoneOnline(room), 'offline': !isEveryoneOnline(room)}"></div>
+                        </div>
+                        <div class="room-name">
+                            {{ room.name }} <span *ngIf="getNotRead(room.key) > 0" class="badge badge-warning">{{ getNotRead(room.key) }}</span>
+                        </div>
+                    </div>
+                    <div class="float-right">
+                        <i class="fas fa-microphone custom-fa-icon"></i>
+
+                        <button (click)="call(room, 1, $event)">
+                            <i class="fas fa-video custom-fa-icon"></i>
+                        </button>
+
+                    </div>
                 </li>
             </ul>
         </div>
         
         <div class="col-8">
-            <ul>
-                <li *ngFor="let talk of talks">
-                    {{ message.message }}
+            <ul *ngIf="selectedRoom">
+                <li *ngFor="let message of selectedRoom.messages">
+                    {{ message.message }} ({{ getWhoHaveSeen(message) | json }})
                 </li>
             </ul>
             <form [formGroup]="form" (submit)="sendMessage()">
                 <input type="text" formControlName="message" />
-                <button type="submit" [disabled]="form.invalid">Enviar</button>
+                <button type="submit" [disabled]="form.invalid">{{ "send" | translate }}</button>
             </form>
         </div>
     </div>
 </div>
+
+<ng-template #callModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Call</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss(false)">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <button type="button" class="btn btn-success" (click)="modal.close(true)">Join</button>
+        <button type="button" class="btn btn-danger" (click)="modal.close(false)">Refuse</button>
+    </div>
+</ng-template>

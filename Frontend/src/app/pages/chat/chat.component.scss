@@ -1,0 +1,40 @@
+.chats {
+    background-color: white;
+}
+
+.list-group {
+    margin: 15px 0;
+}
+
+.custom-fa-icon {
+    font-size: 2.5em;
+    padding: 7px 0 7px 0;
+}
+
+.room-block{
+    cursor: pointer;
+}
+
+.room-name{
+    margin: 8px 0 0 13px;
+    float: left;}
+
+.profile-pic{
+    position: relative;
+    float: left;
+    .status{
+        position: absolute;
+        top:30px;
+        left:30px;
+        width: 10px;
+        height: 10px;
+        border-radius: 10px;
+        &.online{
+            background-color: green;
+        }
+        &.offline{
+            background-color: gray;
+        }
+    }
+}
+

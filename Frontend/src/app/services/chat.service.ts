@@ -3,9 +3,11 @@ import { SignalRService } from './signal-r.service';
 import { Message } from '../models/message';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { User } from '../models/user';
+import { UserInRoom } from '../models/user-in-room';
 import { RoomMessage } from '../models/room-message';
-import { Talk } from '../models/chat';
+import { Room } from '../models/room';
+import { ViewedMessage } from '../models/viewed-message';
+import { Call } from '../models/call';
 
 @Injectable({
   providedIn: 'root'
@@ -16,27 +18,47 @@ export class ChatService {
     this.signalR.connect("chat");
   }
 
-  public getUsersOnline(): Observable<User[]> {
-    return this.http.get<User[]>("api/users/online");
+  public getMyRooms(): Observable<Room[]> {
+    return this.signalR.listen<Room[]>("my-rooms");
   }
 
   public sendMessage(message: RoomMessage): Observable<void> {
     return this.signalR.send<RoomMessage>("send-message", message);
   }
 
-  public listen(): Observable<RoomMessage>{
+  public viewedRoom(roomKey: string): Observable<void> {
+    return this.signalR.send<string>("viewed-room", roomKey);
+  }
+
+  public listenViewedRoom(): Observable<ViewedMessage> {
+    return this.signalR.listen<ViewedMessage>("viewed-room");
+  }
+
+  public listenForMessages(): Observable<RoomMessage>{
     return this.signalR.listen<RoomMessage>("received-message");
   }
 
-  public onEnterRoom(): Observable<User>{
-    return this.signalR.listen<User>("enter-room");
+  public onEnterRoom(): Observable<UserInRoom>{
+    return this.signalR.listen<UserInRoom>("enter-room");
   }
 
-  public onLeaveRoom(): Observable<User>{
-    return this.signalR.listen<User>("leave-room");
+  public onLeaveRoom(): Observable<UserInRoom>{
+    return this.signalR.listen<UserInRoom>("leave-room");
   }
 
-  public getChatWith(userId: number): Observable<Talk> {
-    return this.http.get<Talk>(`api/chat/with-user/${userId}`);
+  public getChatWith(userId: number): Observable<Room> {
+    return this.http.get<Room>(`api/talk/with-user/${userId}`);
+  }
+
+  public call(call: Call): Observable<void>{
+    return this.signalR.send("call", call)
+  }
+
+  public onCalled(): Observable<Call> {
+    return this.signalR.listen<Call>("call");
+  }
+
+  public whenSomeoneAskMyPeer(): Observable<any> {
+    return this.signalR.listen("ask-peer");
   }
 }

@@ -1,3 +1,8 @@
 {
-    
+    "send": "Send",
+    "chat": {
+        "users-online": "Users online",
+        "users-offline": "Users offline",
+        "groups": "Groups"
+    }
 }

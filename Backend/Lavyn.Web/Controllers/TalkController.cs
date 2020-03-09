@@ -19,7 +19,7 @@ namespace Lavyn.Web.Controllers
         [Route("with-user/{id}")]
         public async Task<IActionResult> GetOnlineUsers(long id)
         {
-            return Ok(roomServices.GetChatId(id));
+            return Ok(await roomServices.GetOrCreateRoomWith(id));
         }
     }
 }

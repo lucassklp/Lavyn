@@ -26,6 +26,10 @@ export class AuthenticationService {
     return user;
   }
 
+  public get userId(): number {
+    return parseInt(this.user.nameid)
+  }
+
   public logout(){
     localStorage.removeItem('token')
   }

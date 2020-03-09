@@ -12,6 +12,7 @@ import { NgxErrorsModule } from '@hackages/ngxerrors';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { GravatarModule } from  'ngx-gravatar';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { LoginComponent } from './pages/login/login.component';
 import { LoginService } from './services/login.service';
@@ -21,6 +22,8 @@ import { AuthenticationInterceptor } from './interceptors/authentication.interce
 import { RegisterComponent } from './pages/register/register.component';
 import { ChatComponent } from './pages/chat/chat.component';
 import { SignalRService } from './services/signal-r.service';
+import { CallComponent } from './pages/call/call.component';
+import { WebrtcService } from './services/webrtc.service';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -33,7 +36,8 @@ export function createTranslateLoader(http: HttpClient) {
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    ChatComponent
+    ChatComponent,
+    CallComponent
   ],
   imports: [
     BrowserModule,
@@ -42,6 +46,7 @@ export function createTranslateLoader(http: HttpClient) {
     ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
+    NgbModule,
     NgxErrorsModule,
     ToastrModule.forRoot(),
     GravatarModule,
@@ -57,6 +62,7 @@ export function createTranslateLoader(http: HttpClient) {
     AuthenticationService,
     LoginService,
     SignalRService,
+    WebrtcService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthenticationInterceptor,

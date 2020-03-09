@@ -1,9 +1,14 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { ChatService } from 'src/app/services/chat.service';
-import { User } from 'src/app/models/user';
-import { Message } from 'src/app/models/message';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RoomMessage } from 'src/app/models/room-message';
+import { Room } from 'src/app/models/room';
+import { UserInRoom } from 'src/app/models/user-in-room';
+import { Message } from 'src/app/models/message';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Call, CallType } from 'src/app/models/call';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-chat',
@@ -12,63 +17,139 @@ import { RoomMessage } from 'src/app/models/room-message';
 })
 export class ChatComponent implements OnInit {
 
-  usersOnline: User[] = [];
+  selectedRoom: Room;
+  rooms: { [roomKey: string]: Room } = {};
+  notRead: { [roomKey: string]: number } = {};
   form: FormGroup;
-  currentRoomId: number;
-  talks: {[roomId: number]: Message[]};
 
-  constructor(private chatService: ChatService, private change: ChangeDetectorRef, private fb: FormBuilder) {
+  @ViewChild('callModal') callModal: ElementRef;
+
+
+  constructor(
+    private chatService: ChatService, 
+    private change: ChangeDetectorRef, 
+    private fb: FormBuilder, 
+    private authService: AuthenticationService,
+    private modalService: NgbModal,
+    private route: Router
+    ) {
     this.form = fb.group({
       message: ['', Validators.required]
     });
   }
 
-  ngOnInit(): void {
-    this.chatService.getUsersOnline().subscribe(users => {
-      this.usersOnline = users;
-    });
-
-    this.chatService.onEnterRoom().subscribe(user => {
-      this.usersOnline.unshift(user);
-      this.change.detectChanges();
-      this.getChat(user.id);
-    });
-
-    this.chatService.onLeaveRoom().subscribe(user => {
-      const index = this.usersOnline.findIndex(x => x.id === user.id);
-      if (index > -1) {
-        this.usersOnline.splice(index, 1);
+  getRooms(): Room[] {
+    const rooms = [];
+    for (const key in this.rooms) {
+      if (this.rooms.hasOwnProperty(key)) {
+        rooms.push(this.rooms[key]);
       }
-      this.change.detectChanges();
-    });
-
-    this.chatService.listen().subscribe(receivedMsg => this.putMessage(receivedMsg.roomId, receivedMsg));
+    }
+    return rooms;
   }
 
-  private putMessage(roomId: number, receivedMsg: Message) {
-    const talk = this.talks[roomId];
-    if (talk) {
-      talk.push(receivedMsg);
+  selectRoom(room: Room) {
+    this.selectedRoom = room;
+    this.chatService.viewedRoom(this.selectedRoom.key).subscribe(_ => {
+      delete this.notRead[this.selectedRoom.key];
+    });
+  }
+
+  ngOnInit(): void {  
+    this.chatService.getMyRooms()
+      .subscribe(rooms => {
+        rooms.forEach(room => {
+          this.rooms[room.key] = room;
+          const lastSeen = room.lastViews.find(x => x.userId === this.authService.userId).lastSeen;
+          const notReads = room.messages.filter(message => message.date > lastSeen).length;
+          if (notReads > 0) {
+            this.notRead[room.key] = notReads;
+          }
+        });
+
+        const updateUserStatus = (userInRoom: UserInRoom, status: boolean) => {
+          const user = this.rooms[userInRoom.roomKey].participants.find(user => user.id == userInRoom.userId);
+          user.isOnline = status;
+        }
+    
+        this.chatService.onEnterRoom()
+          .subscribe(userInRoom => updateUserStatus(userInRoom, true));
+    
+        this.chatService.onLeaveRoom()
+          .subscribe(userInRoom => updateUserStatus(userInRoom, false));
+
+        this.chatService.listenForMessages()
+          .subscribe(receivedMsg => this.putMessage(receivedMsg));
+
+        this.chatService.listenViewedRoom().subscribe(lastViewed => {
+          const index = this.rooms[lastViewed.roomKey].lastViews.findIndex(x => x.userId == lastViewed.userId);
+          this.rooms[lastViewed.roomKey].lastViews[index].lastSeen = lastViewed.lastSeen;
+          this.change.detectChanges();
+        });
+
+
+        this.chatService.onCalled().subscribe(call => {
+          if (call.callerId !== this.authService.userId) {
+            this.modalService.open(this.callModal).result.then((result: boolean) => {
+              if(result){
+                this.route.navigate(['call', call.key]);
+              }
+            });
+          } else {
+            this.route.navigate(['call', call.key]);
+          }
+        });
+      });
+  }
+
+  isEveryoneOnline(room: Room): boolean {
+    if (room && room.participants) {
+      return !room.participants.some(x => !x.isOnline);
+    }
+    return false;
+  }
+
+  getWhoHaveSeen(message: Message): Array<number> {
+    return this.selectedRoom.lastViews.filter(x => x.lastSeen >= message.date)
+      .map(viewer => viewer.userId)
+  }
+
+  private putMessage(receivedMsg: RoomMessage) {
+    const room = this.rooms[receivedMsg.roomKey];
+    if (room) {
+      room.messages.push(receivedMsg);
     } else {
-      this.talks[roomId] = [receivedMsg];
+      this.rooms[receivedMsg.roomKey].messages = [receivedMsg];
+    }
+    if(!this.selectedRoom || this.selectedRoom.key !== room.key){
+      if(!this.notRead.hasOwnProperty(room.key)){
+        this.notRead[room.key] = 1;
+      } else {
+        this.notRead[room.key] += 1;
+      }
+    } else {
+      this.chatService.viewedRoom(this.selectedRoom.key).subscribe()
     }
   }
 
-  getChat(userId: number) {
-    this.chatService.getChatWith(userId).subscribe(talk => {
-      this.currentRoomId = talk.roomId;
-      for (const message of talk.messages) {
-        this.putMessage(talk.roomId, message);
-      }
-    });
+  getNotRead(roomKey: string): number {
+    return this.notRead[roomKey] || 0;
   }
 
   sendMessage() {
     const msg = new RoomMessage();
-    msg.roomId = this.currentRoomId;
+    msg.roomKey = this.selectedRoom.key;
     msg.message = this.form.controls.message.value as string;
     this.chatService.sendMessage(msg).subscribe();
     this.form.controls.message.setValue('');
+  }
+
+  call(room: Room, callType: CallType, event: Event){
+    event.stopPropagation();
+    const call = new Call();
+    call.callType = callType;
+    call.key = room.key;
+    this.chatService.call(call);
   }
 
 }
