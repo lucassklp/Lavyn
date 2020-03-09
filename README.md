@@ -10,6 +10,7 @@ The application is made using:
 - SignalR (socket)
 - Peerjs (WebRTC)
 - MySQL
+- Electron (desktop)
 
 ## Running
 
