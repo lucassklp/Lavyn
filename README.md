@@ -11,6 +11,7 @@ The application is made using:
 - Peerjs (WebRTC)
 - MySQL
 - Electron (desktop)
+- Rx.Http
 
 ## Running
 
