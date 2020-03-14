@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { SignalRService } from './signal-r.service';
-import { Message } from '../models/message';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { UserInRoom } from '../models/user-in-room';
@@ -56,9 +55,5 @@ export class ChatService {
 
   public onCalled(): Observable<Call> {
     return this.signalR.listen<Call>("call");
-  }
-
-  public whenSomeoneAskMyPeer(): Observable<any> {
-    return this.signalR.listen("ask-peer");
   }
 }

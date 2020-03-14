@@ -87,7 +87,6 @@ export class ChatComponent implements OnInit {
           this.change.detectChanges();
         });
 
-
         this.chatService.onCalled().subscribe(call => {
           if (call.callerId !== this.authService.userId) {
             this.modalService.open(this.callModal).result.then((result: boolean) => {

@@ -1,4 +1,5 @@
 export class Call {
+    callerId: number;
     callType: CallType;
     key: string;
 }
