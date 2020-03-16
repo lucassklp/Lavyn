@@ -17,9 +17,9 @@ The application is made using:
 
 In order to run the application, you must run following commands:
 
-``git clone https://github.com/lucassklp/Default.Architecture.git``
+``git clone https://github.com/lucassklp/Lavyn.git``
 
-``cd Default.Architecture``
+``cd Lavyn``
 
 ``docker-compose build --no-cache``
 
