@@ -57,7 +57,7 @@ namespace Lavyn.Business
                 .ToList();
         }
         
-        public async Task<RoomDto> GetOrCreateRoomWith(params long[] userIds)
+        public async Task<RoomDto> GetOrCreateRoom(string name = null, params long[] userIds)
         {
             var ids = userIds.ToList();
             ids.Add(authenticatedUser.Id);
@@ -70,12 +70,13 @@ namespace Lavyn.Business
             
             room = new Room()
             {
+                Name = name,
                 Type = ids.Count > 2 ? RoomType.Group : RoomType.Individual,
                 Key = key,
                 UserHasRoom = ids.Select(id => new UserHasRoom { UserId = id }).ToList()
             };
 
-            roomRepository.Create(room);
+            await roomRepository.CreateAsync(room);
             
             return ConvertToDto(room);
         }

@@ -23,8 +23,7 @@ import { RegisterComponent } from './pages/register/register.component';
 import { ChatComponent } from './pages/chat/chat.component';
 import { SignalRService } from './services/signal-r.service';
 import { CallComponent } from './pages/call/call.component';
-import { WebrtcService } from './services/webrtc.service';
-
+import { MenuComponent } from './components/menu/menu.component';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -37,7 +36,8 @@ export function createTranslateLoader(http: HttpClient) {
     LoginComponent,
     RegisterComponent,
     ChatComponent,
-    CallComponent
+    CallComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,
@@ -61,8 +61,6 @@ export function createTranslateLoader(http: HttpClient) {
   providers: [
     AuthenticationService,
     LoginService,
-    SignalRService,
-    WebrtcService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthenticationInterceptor,

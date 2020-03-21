@@ -9,7 +9,7 @@ import { ChatService } from './services/chat.service';
 export class AppComponent {
   title = 'lavyn';
 
-  constructor(private chatService: ChatService) {
+  constructor() {
     //this.chatService.
   }
 }

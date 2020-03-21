@@ -1,3 +1,5 @@
+<app-menu></app-menu>
+
 <div class="container">
     <div class="row">
         <div class="col-4">
@@ -12,18 +14,10 @@
                             {{ room.name }} <span *ngIf="getNotRead(room.key) > 0" class="badge badge-warning">{{ getNotRead(room.key) }}</span>
                         </div>
                     </div>
-                    <div class="float-right">
-                        <i class="fas fa-microphone custom-fa-icon"></i>
-
-                        <button (click)="call(room, 1, $event)">
-                            <i class="fas fa-video custom-fa-icon"></i>
-                        </button>
-
-                    </div>
                 </li>
             </ul>
         </div>
-        
+            badge-warning 
         <div class="col-8">
             <ul *ngIf="selectedRoom">
                 <li *ngFor="let message of selectedRoom.messages">
@@ -49,4 +43,4 @@
         <button type="button" class="btn btn-success" (click)="modal.close(true)">Join</button>
         <button type="button" class="btn btn-danger" (click)="modal.close(false)">Refuse</button>
     </div>
-</ng-template>
+0 q  

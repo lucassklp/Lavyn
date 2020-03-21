@@ -19,11 +19,11 @@ namespace Lavyn.Business
             services.AddTransient<UserServices>();
             services.AddTransient<RoomServices>();
             services.AddTransient<ChatServices>();
+            services.AddTransient<CallServices>();
 
             services.AddTransient<AuthenticatedUserProvider>();
             services.AddTransient(x => x.GetService<AuthenticatedUserProvider>().GetAuthenticatedUser());
 
-            
             return services;
         }
     }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { ChatService } from 'src/app/services/chat.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RoomMessage } from 'src/app/models/room-message';
@@ -9,13 +9,14 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Call, CallType } from 'src/app/models/call';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
 
   selectedRoom: Room;
   rooms: { [roomKey: string]: Room } = {};
@@ -23,19 +24,24 @@ export class ChatComponent implements OnInit {
   form: FormGroup;
 
   @ViewChild('callModal') callModal: ElementRef;
+  onCalledSubscription: Subscription;
+  roomSubscription: Subscription;
 
 
   constructor(
-    private chatService: ChatService, 
-    private change: ChangeDetectorRef, 
-    private fb: FormBuilder, 
+    private chatService: ChatService,
+    private change: ChangeDetectorRef,
+    private fb: FormBuilder,
     private authService: AuthenticationService,
     private modalService: NgbModal,
     private route: Router
-    ) {
+  ) {
     this.form = fb.group({
       message: ['', Validators.required]
     });
+  }
+
+  ngOnDestroy(): void {
   }
 
   getRooms(): Room[] {
@@ -55,50 +61,71 @@ export class ChatComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {  
-    this.chatService.getMyRooms()
-      .subscribe(rooms => {
-        rooms.forEach(room => {
-          this.rooms[room.key] = room;
-          const lastSeen = room.lastViews.find(x => x.userId === this.authService.userId).lastSeen;
-          const notReads = room.messages.filter(message => message.date > lastSeen).length;
-          if (notReads > 0) {
-            this.notRead[room.key] = notReads;
-          }
+  private addRooms(rooms: Room[]): void {
+    rooms.forEach(room => {
+      this.rooms[room.key] = room;
+      const lastSeen = room.lastViews.find(x => x.userId === this.authService.userId).lastSeen;
+      const notReads = room.messages.filter(message => message.date > lastSeen).length;
+      if (notReads > 0) {
+        this.notRead[room.key] = notReads;
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    if(this.chatService.isConnected()){
+      console.log("http");
+      this.chatService.getMyRooms().subscribe(rooms => this.addRooms(rooms));
+      this.subscribe();
+    } else {
+      this.chatService.connect()
+      this.chatService.onConnected().subscribe(() => {
+        let myRoomsSubscriptions = this.chatService.listenMyRooms().subscribe(rooms => {
+          this.addRooms(rooms);
+          myRoomsSubscriptions.unsubscribe();
         });
+        this.subscribe();
+      });      
+    }
+  }
 
-        const updateUserStatus = (userInRoom: UserInRoom, status: boolean) => {
-          const user = this.rooms[userInRoom.roomKey].participants.find(user => user.id == userInRoom.userId);
-          user.isOnline = status;
-        }
-    
-        this.chatService.onEnterRoom()
-          .subscribe(userInRoom => updateUserStatus(userInRoom, true));
-    
-        this.chatService.onLeaveRoom()
-          .subscribe(userInRoom => updateUserStatus(userInRoom, false));
+  private subscribe(){
+    this.chatService.onEnterRoom()
+      .subscribe(userInRoom => this.updateUserStatus(userInRoom, true));
 
-        this.chatService.listenForMessages()
-          .subscribe(receivedMsg => this.putMessage(receivedMsg));
+    this.chatService.onLeaveRoom()
+      .subscribe(userInRoom => this.updateUserStatus(userInRoom, false));
 
-        this.chatService.listenViewedRoom().subscribe(lastViewed => {
-          const index = this.rooms[lastViewed.roomKey].lastViews.findIndex(x => x.userId == lastViewed.userId);
-          this.rooms[lastViewed.roomKey].lastViews[index].lastSeen = lastViewed.lastSeen;
-          this.change.detectChanges();
-        });
+    this.chatService.listenForMessages()
+      .subscribe(receivedMsg => this.putMessage(receivedMsg));
 
-        this.chatService.onCalled().subscribe(call => {
-          if (call.callerId !== this.authService.userId) {
-            this.modalService.open(this.callModal).result.then((result: boolean) => {
-              if(result){
-                this.route.navigate(['call', call.key]);
-              }
-            });
-          } else {
+    this.chatService.listenViewedRoom().subscribe(lastViewed => {
+      const index = this.rooms[lastViewed.roomKey].lastViews.findIndex(x => x.userId == lastViewed.userId);
+      this.rooms[lastViewed.roomKey].lastViews[index].lastSeen = lastViewed.lastSeen;
+      this.change.detectChanges();
+    });
+
+    this.chatService.onCalled().subscribe(call => {
+      if (call.callerId !== this.authService.userId) {
+        this.modalService.open(this.callModal).result.then((result: boolean) => {
+          if (result) {
             this.route.navigate(['call', call.key]);
           }
         });
-      });
+      } else {
+        this.route.navigate(['call', call.key]);
+      }
+    });
+  }
+
+
+  updateUserStatus(userInRoom: UserInRoom, status: boolean) {
+    const room = this.rooms[userInRoom.roomKey];
+    if(room){
+      const user = room.participants.find(user => user.id == userInRoom.userId);
+      user.isOnline = status;
+    }
+    this.change.detectChanges();
   }
 
   isEveryoneOnline(room: Room): boolean {
@@ -120,8 +147,8 @@ export class ChatComponent implements OnInit {
     } else {
       this.rooms[receivedMsg.roomKey].messages = [receivedMsg];
     }
-    if(!this.selectedRoom || this.selectedRoom.key !== room.key){
-      if(!this.notRead.hasOwnProperty(room.key)){
+    if (!this.selectedRoom || this.selectedRoom.key !== room.key) {
+      if (!this.notRead.hasOwnProperty(room.key)) {
         this.notRead[room.key] = 1;
       } else {
         this.notRead[room.key] += 1;
@@ -143,12 +170,16 @@ export class ChatComponent implements OnInit {
     this.form.controls.message.setValue('');
   }
 
-  call(room: Room, callType: CallType, event: Event){
+  call(room: Room, callType: CallType, event: Event) {
     event.stopPropagation();
     const call = new Call();
     call.callType = callType;
     call.key = room.key;
-    this.chatService.call(call);
+    this.chatService.call(call)
+      .subscribe(
+        () => console.log("Entering on call " + room.key),
+        (err) => console.error(err)
+      );
   }
 
 }

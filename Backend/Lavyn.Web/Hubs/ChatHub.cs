@@ -87,15 +87,14 @@ namespace Lavyn.Web.Hubs
             await ViewedMessages(chat.RoomKey);
         }
 
-        [HubMethodName("connect-call")]
+        [HubMethodName("call")]
         public async Task Call(CallDto call)
         {
-            var token = _chatServices.CreateCallToken(call);
             await Clients.Group(call.Key)
                 .SendAsync("call", new CallDto()
                 {
                     CallType = call.CallType,
-                    Key = token,
+                    Key = call.Key,
                     CallerId = _authenticatedUser.Id
                 });
         }

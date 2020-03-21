@@ -4,34 +4,55 @@ import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 import { Observable, from, Observer } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class SignalRService {
+export abstract class SignalRService {
 
   private hubConnection: signalR.HubConnection
 
   constructor(private authService: AuthenticationService) { }
 
-  public connect(channel: string): Observable<void> {
+  private onConntected$: Observable<void>
+
+  protected connectTo(channel: string): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`http://localhost:5010/${channel}`, {
         accessTokenFactory: () => this.authService.token
       })
       .build();
 
-    return from(this.hubConnection.start())
+      this.onConntected$ = from(this.hubConnection.start());
   }
 
-  public send<T>(method: string, message: T): Observable<void> {
+  public abstract connect(): void;
+
+  public onConnected(): Observable<void> {
+    return this.onConntected$;
+  }
+
+  protected send<T>(method: string, message: T): Observable<void> {
     return from(this.hubConnection.send(method, message));
   }
 
-  public listen<T>(method: string): Observable<T> {
+  protected listen<T>(method: string): Observable<T> {
     return Observable.create((observer: Observer<T>) => {
       this.hubConnection.on(method, message => {
         observer.next(message);
       })
     })
   }
+
+  protected sendAndListen<T, R>(method: string, message: T): Observable<R> {
+    this.send<T>(method, message);
+    return this.listen<R>(method);
+  }
+
+  public disconect(): void {
+    this.hubConnection.stop();
+  }
+
+  public isConnected(): boolean {
+    if(!this.hubConnection)
+      return false;
+    return this.hubConnection.state === signalR.HubConnectionState.Connected;
+  }
+
 }

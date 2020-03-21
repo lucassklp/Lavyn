@@ -44,7 +44,7 @@ namespace Lavyn.Web.Authentication.Jwt
                         // If the request is for our hub...
                         var path = context.HttpContext.Request.Path;
                         if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/chat")))
+                            (path.StartsWithSegments("/chat") || path.StartsWithSegments("/call")))
                         {
                             // Read the token out of the query string
                             context.Token = accessToken;

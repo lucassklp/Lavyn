@@ -7,42 +7,50 @@ import { RoomMessage } from '../models/room-message';
 import { Room } from '../models/room';
 import { ViewedMessage } from '../models/viewed-message';
 import { Call } from '../models/call';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class ChatService extends SignalRService {
+  public connect(): void {
+    this.connectTo("chat");
+  }
 
-  constructor(private signalR: SignalRService, private http: HttpClient){
-    this.signalR.connect("chat");
+  constructor(private http: HttpClient, authService: AuthenticationService){
+    super(authService);
   }
 
   public getMyRooms(): Observable<Room[]> {
-    return this.signalR.listen<Room[]>("my-rooms");
+    return this.http.get<Room[]>("api/talk/my-talks");
+  }
+
+  public listenMyRooms(): Observable<Room[]> {
+    return this.listen<Room[]>("my-rooms");
   }
 
   public sendMessage(message: RoomMessage): Observable<void> {
-    return this.signalR.send<RoomMessage>("send-message", message);
+    return this.send<RoomMessage>("send-message", message);
   }
 
   public viewedRoom(roomKey: string): Observable<void> {
-    return this.signalR.send<string>("viewed-room", roomKey);
+    return this.send<string>("viewed-room", roomKey);
   }
 
   public listenViewedRoom(): Observable<ViewedMessage> {
-    return this.signalR.listen<ViewedMessage>("viewed-room");
+    return this.listen<ViewedMessage>("viewed-room");
   }
 
   public listenForMessages(): Observable<RoomMessage>{
-    return this.signalR.listen<RoomMessage>("received-message");
+    return this.listen<RoomMessage>("received-message");
   }
 
   public onEnterRoom(): Observable<UserInRoom>{
-    return this.signalR.listen<UserInRoom>("enter-room");
+    return this.listen<UserInRoom>("enter-room");
   }
 
   public onLeaveRoom(): Observable<UserInRoom>{
-    return this.signalR.listen<UserInRoom>("leave-room");
+    return this.listen<UserInRoom>("leave-room");
   }
 
   public getChatWith(userId: number): Observable<Room> {
@@ -50,10 +58,10 @@ export class ChatService {
   }
 
   public call(call: Call): Observable<void>{
-    return this.signalR.send("call", call)
+    return this.send("call", call)
   }
 
   public onCalled(): Observable<Call> {
-    return this.signalR.listen<Call>("call");
+    return this.listen<Call>("call");
   }
 }

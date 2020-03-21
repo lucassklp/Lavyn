@@ -93,10 +93,5 @@ namespace Lavyn.Business
 
             return result;
         }
-
-        public string CreateCallToken(CallDto call)
-        {
-            return $"{call.CallType.ToString()}_{call.Key}".ToSha512();
-        }
     }
 }

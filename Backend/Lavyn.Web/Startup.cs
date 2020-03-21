@@ -109,6 +109,7 @@ namespace Lavyn.Web
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapHub<CallHub>("/call");
             });
         }
     }
