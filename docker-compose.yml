@@ -12,7 +12,7 @@ services:
     build:
       context: ./Frontend/
     ports: 
-      - '80:80'
+      - '8080:80'
     depends_on: 
       - 'backend'
 
@@ -23,4 +23,4 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 4tl4nt45
     ports:
-      - "3307:3306"
+      - "3380:3306"

@@ -15,7 +15,7 @@ namespace Lavyn.Persistence.Extensions
                 // Replace column names            
                 foreach (var property in entity.GetProperties())
                 {
-                    property.SetColumnName(property.GetColumnName().ToSnakeCase());
+                    property.SetColumnName(property.Name.ToSnakeCase());
                 }
 
                 foreach (var key in entity.GetKeys())
@@ -30,7 +30,7 @@ namespace Lavyn.Persistence.Extensions
 
                 foreach (var index in entity.GetIndexes())
                 {
-                    index.SetName(index.GetName().ToSnakeCase());
+                    index.SetDatabaseName(index.Name.ToSnakeCase());
                 }
             }
         }

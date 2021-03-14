@@ -1,8 +1,8 @@
-FROM node:12.16.0 as build
+FROM node:14.16.0 as build
 
 WORKDIR /src
 COPY . .
-RUN npm install -g @angular/cli@9.0.2
+RUN npm install -g @angular/cli
 RUN npm install
 RUN ng build --prod 
 
