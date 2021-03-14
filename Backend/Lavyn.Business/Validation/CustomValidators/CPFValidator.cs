@@ -1,11 +1,10 @@
-﻿using FluentValidation.Resources;
-using FluentValidation.Validators;
+﻿using FluentValidation.Validators;
 
 namespace Lavyn.Business.Validators.CustomValidators
 {
     public class CPFValidator : PropertyValidator
     {
-        public CPFValidator() : base(new LanguageStringSource(nameof(CPFValidator)))
+        public CPFValidator() : base()
         {
         }
 

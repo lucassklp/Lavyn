@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using Lavyn.Domain;
 using Lavyn.Domain.Dtos;
 using Lavyn.Web.Authentication;
@@ -18,9 +17,9 @@ namespace Lavyn.Web.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] CredentialDto user)
+        public IActionResult Login([FromBody] CredentialDto user)
         {
-            string token = await this.authenticator.Login(user);
+            string token = authenticator.Login(user);
             if(string.IsNullOrWhiteSpace(token))
             {
                 return Unauthorized();

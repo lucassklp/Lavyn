@@ -1,6 +1,5 @@
 ﻿using Lavyn.Core.Extensions;
 using System;
-using System.Threading.Tasks;
 using Lavyn.Business.Exceptions;
 using Lavyn.Domain;
 using Lavyn.Domain.Entities;
@@ -37,7 +36,5 @@ namespace Lavyn.Business
             user.IsOnline = isOnline;
             return this.repository.UpdateAsync(user);
         }
-
-        public async Task<User> LoginAsync(ICredential credential) => Login(credential);
     }
 }

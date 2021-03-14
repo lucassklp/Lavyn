@@ -7,7 +7,7 @@ namespace Lavyn.Business.Validation
 {
     public class ValidationInterceptor : IValidatorInterceptor
     {
-        public ValidationResult AfterMvcValidation(ControllerContext controllerContext, ValidationContext validationContext, ValidationResult result)
+        public ValidationResult AfterMvcValidation(ControllerContext controllerContext, IValidationContext commonContext, ValidationResult result)
         {
             if (!result.IsValid)
             {
@@ -16,9 +16,9 @@ namespace Lavyn.Business.Validation
             return result;
         }
 
-        public ValidationContext BeforeMvcValidation(ControllerContext controllerContext, ValidationContext validationContext)
+        public IValidationContext BeforeMvcValidation(ControllerContext controllerContext, IValidationContext commonContext)
         {
-            return validationContext;
+            return commonContext;
         }
     }
 }

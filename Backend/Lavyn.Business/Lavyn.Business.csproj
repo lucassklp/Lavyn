@@ -1,18 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Lavyn.Business</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Auto.Mapping" Version="0.0.4" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.1" />
-    <PackageReference Include="Rx.Http" Version="1.2.0" />
-    <PackageReference Include="System.Reactive.Core" Version="4.3.2" />
-    <PackageReference Include="System.Reactive.Interfaces" Version="4.3.2" />
-    <PackageReference Include="System.Reactive.Linq" Version="4.3.2" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.2" />
+    <PackageReference Include="Rx.Http" Version="1.3.0" />
+    <PackageReference Include="System.Reactive.Core" Version="5.0.0" />
+    <PackageReference Include="System.Reactive.Interfaces" Version="5.0.0" />
+    <PackageReference Include="System.Reactive.Linq" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

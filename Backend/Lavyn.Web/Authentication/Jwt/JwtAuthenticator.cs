@@ -18,18 +18,18 @@ namespace Lavyn.Web.Authentication.Jwt
             loginService = repository;
         }
 
-        public async Task<string> Login(ICredential credential)
+        public string Login(ICredential credential)
         {
-            var user = await loginService.LoginAsync(credential);
+            var user = loginService.Login(credential);
 
             if (user != null)
             {
-                return await this.GenerateToken(user);
+                return GenerateToken(user);
             }
             else return null;
         }
 
-        private async Task<string> GenerateToken(User user)
+        private string GenerateToken(User user)
         {
             var handler = new JwtSecurityTokenHandler();
 
