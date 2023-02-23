@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
       login: this.form.controls['email'].value,
       password: this.form.controls['password'].value
     }).subscribe(res => {
-      this.authService.token = res.token;
+      this.authService.token = res.token!;
       this.authService.user;
       this.router.navigate(['chat'])
     });

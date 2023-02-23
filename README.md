@@ -5,8 +5,8 @@ A open-source chat featured with text, image, audio, screensharing and video cal
 
 The application is made using:
 - Docker
-- Angular 9
-- ASP.Net Core 3.1
+- Angular 15
+- ASP.Net Core 7
 - SignalR (socket)
 - Peerjs (WebRTC)
 - MySQL

@@ -18,14 +18,16 @@ import { Subscription } from 'rxjs';
 })
 export class ChatComponent implements OnInit, OnDestroy {
 
-  selectedRoom: Room;
+  selectedRoom?: Room;
   rooms: { [roomKey: string]: Room } = {};
   notRead: { [roomKey: string]: number } = {};
   form: FormGroup;
 
-  @ViewChild('callModal') callModal: ElementRef;
-  onCalledSubscription: Subscription;
-  roomSubscription: Subscription;
+  @ViewChild('callModal') 
+  callModal?: ElementRef;
+  
+  onCalledSubscription?: Subscription;
+  roomSubscription?: Subscription;
 
 
   constructor(
@@ -56,25 +58,24 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   selectRoom(room: Room) {
     this.selectedRoom = room;
-    this.chatService.viewedRoom(this.selectedRoom.key).subscribe(_ => {
-      delete this.notRead[this.selectedRoom.key];
+    this.chatService.viewedRoom(this.selectedRoom.key!).subscribe(_ => {
+      delete this.notRead[this.selectedRoom!.key!];
     });
   }
 
   private addRooms(rooms: Room[]): void {
     rooms.forEach(room => {
-      this.rooms[room.key] = room;
-      const lastSeen = room.lastViews.find(x => x.userId === this.authService.userId).lastSeen;
-      const notReads = room.messages.filter(message => message.date > lastSeen).length;
+      this.rooms[room.key!] = room;
+      const lastSeen = room.lastViews!.find(x => x.userId === this.authService.userId)!.lastSeen;
+      const notReads = room.messages!.filter(message => message.date! > lastSeen!).length;
       if (notReads > 0) {
-        this.notRead[room.key] = notReads;
+        this.notRead[room.key!] = notReads;
       }
     });
   }
 
   ngOnInit(): void {
     if(this.chatService.isConnected()){
-      console.log("http");
       this.chatService.getMyRooms().subscribe(rooms => this.addRooms(rooms));
       this.subscribe();
     } else {
@@ -100,8 +101,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       .subscribe(receivedMsg => this.putMessage(receivedMsg));
 
     this.chatService.listenViewedRoom().subscribe(lastViewed => {
-      const index = this.rooms[lastViewed.roomKey].lastViews.findIndex(x => x.userId == lastViewed.userId);
-      this.rooms[lastViewed.roomKey].lastViews[index].lastSeen = lastViewed.lastSeen;
+      const index = this.rooms[lastViewed.roomKey!].lastViews!.findIndex(x => x.userId == lastViewed.userId);
+      this.rooms[lastViewed.roomKey!].lastViews![index].lastSeen = lastViewed.lastSeen;
       this.change.detectChanges();
     });
 
@@ -120,10 +121,10 @@ export class ChatComponent implements OnInit, OnDestroy {
 
 
   updateUserStatus(userInRoom: UserInRoom, status: boolean) {
-    const room = this.rooms[userInRoom.roomKey];
+    const room = this.rooms[userInRoom.roomKey!];
     if(room){
-      const user = room.participants.find(user => user.id == userInRoom.userId);
-      user.isOnline = status;
+      const user = room.participants!.find(user => user.id == userInRoom.userId);
+      user!.isOnline = status;
     }
     this.change.detectChanges();
   }
@@ -136,25 +137,26 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   getWhoHaveSeen(message: Message): Array<number> {
-    return this.selectedRoom.lastViews.filter(x => x.lastSeen >= message.date)
-      .map(viewer => viewer.userId)
+    return this.selectedRoom!.lastViews!
+      .filter(x => x.lastSeen! >= message.date!)
+      .map(viewer => viewer.userId!)
   }
 
   private putMessage(receivedMsg: RoomMessage) {
-    const room = this.rooms[receivedMsg.roomKey];
+    const room = this.rooms[receivedMsg.roomKey!];
     if (room) {
-      room.messages.push(receivedMsg);
+      room.messages!.push(receivedMsg);
     } else {
-      this.rooms[receivedMsg.roomKey].messages = [receivedMsg];
+      this.rooms[receivedMsg.roomKey!].messages = [receivedMsg];
     }
     if (!this.selectedRoom || this.selectedRoom.key !== room.key) {
-      if (!this.notRead.hasOwnProperty(room.key)) {
-        this.notRead[room.key] = 1;
+      if (!this.notRead.hasOwnProperty(room.key!)) {
+        this.notRead[room.key!] = 1;
       } else {
-        this.notRead[room.key] += 1;
+        this.notRead[room.key!] += 1;
       }
     } else {
-      this.chatService.viewedRoom(this.selectedRoom.key).subscribe()
+      this.chatService.viewedRoom(this.selectedRoom.key!).subscribe()
     }
   }
 
@@ -164,10 +166,10 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   sendMessage() {
     const msg = new RoomMessage();
-    msg.roomKey = this.selectedRoom.key;
-    msg.message = this.form.controls.message.value as string;
+    msg.roomKey = this.selectedRoom!.key;
+    msg.message = this.form.controls['message'].value as string;
     this.chatService.sendMessage(msg).subscribe();
-    this.form.controls.message.setValue('');
+    this.form.controls['message'].setValue('');
   }
 
   call(room: Room, callType: CallType, event: Event) {
@@ -177,9 +179,9 @@ export class ChatComponent implements OnInit, OnDestroy {
     call.key = room.key;
     this.chatService.call(call)
       .subscribe(
-        () => console.log("Entering on call " + room.key),
-        (err) => console.error(err)
+        _ => console.log("Entering on call " + room.key),
+        (err) => console.error(err),
+        () => {}
       );
   }
-
 }

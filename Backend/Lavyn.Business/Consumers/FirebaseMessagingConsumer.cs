@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Rx.Http;
@@ -7,11 +8,11 @@ using Rx.Http.Interceptors;
 
 namespace Lavyn.Business.Consumers
 {
-    public class FirebaseMessagingConsumer : RxConsumer
+    public class FirebaseMessagingConsumer : RxHttpClient
     {
-        public FirebaseMessagingConsumer(IConsumerContext<FirebaseMessagingConsumer> consumerConfiguration, IConfiguration configuration) : base(consumerConfiguration)
+        public FirebaseMessagingConsumer(HttpClient client, IConfiguration configuration): base(client, null)
         {
-            consumerConfiguration.RequestInterceptors.Add(new FirebaseMessagingInterceptor(configuration));
+            RequestInterceptors.Add(new FirebaseMessagingInterceptor(configuration));
         }
 
         public IObservable<FirebaseMessagingResponseDto> Send(FirebaseMessagingRequestDto message) =>

@@ -12,7 +12,7 @@ namespace Lavyn.Persistence.Map
 
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.Date);
-            builder.Property(x => x.Content).HasColumnType("MEDIUMTEXT");
+            builder.Property(x => x.Content).HasColumnType("text");
             builder.Property(x => x.RoomId);
             builder.Property(x => x.SenderId);
 

@@ -1,16 +1,14 @@
-import { Injectable } from '@angular/core';
-import * as signalR from "@aspnet/signalr";
-import { Message } from '@angular/compiler/src/i18n/i18n_ast';
+import * as signalR from "@microsoft/signalr";
 import { Observable, from, Observer } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 
 export abstract class SignalRService {
 
-  private hubConnection: signalR.HubConnection
+  private hubConnection?: signalR.HubConnection
 
   constructor(private authService: AuthenticationService) { }
 
-  private onConntected$: Observable<void>
+  private onConntected$?: Observable<void>
 
   protected connectTo(channel: string): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -25,16 +23,16 @@ export abstract class SignalRService {
   public abstract connect(): void;
 
   public onConnected(): Observable<void> {
-    return this.onConntected$;
+    return this.onConntected$!;
   }
 
   protected send<T>(method: string, message: T): Observable<void> {
-    return from(this.hubConnection.send(method, message));
+    return from(this.hubConnection!.send(method, message));
   }
 
   protected listen<T>(method: string): Observable<T> {
     return Observable.create((observer: Observer<T>) => {
-      this.hubConnection.on(method, message => {
+      this.hubConnection!.on(method, message => {
         observer.next(message);
       })
     })
@@ -46,7 +44,7 @@ export abstract class SignalRService {
   }
 
   public disconect(): void {
-    this.hubConnection.stop();
+    this.hubConnection!.stop();
   }
 
   public isConnected(): boolean {

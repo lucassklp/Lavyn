@@ -11,7 +11,7 @@
                             <div class="status" [ngClass]="{'online': isEveryoneOnline(room), 'offline': !isEveryoneOnline(room)}"></div>
                         </div>
                         <div class="room-name">
-                            {{ room.name }} <span *ngIf="getNotRead(room.key) > 0" class="badge badge-warning">{{ getNotRead(room.key) }}</span>
+                            {{ room.name }} <span *ngIf="getNotRead(room.key!) > 0" class="badge badge-warning">{{ getNotRead(room.key!) }}</span>
                         </div>
                     </div>
                 </li>

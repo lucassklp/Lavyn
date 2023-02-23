@@ -1,7 +1,7 @@
 export class Call {
-    callerId: number;
-    callType: CallType;
-    key: string;
+    callerId?: number;
+    callType?: CallType;
+    key?: string;
 }
 
 export enum CallType {

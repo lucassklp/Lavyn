@@ -1,4 +1,4 @@
 export class UserInRoom {
-    userId: number;
-    roomKey: string;
+    userId?: number;
+    roomKey?: string;
 }

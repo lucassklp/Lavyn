@@ -1,4 +1,4 @@
 export class EnterCall {
-    key: string;
-    peerId: string;
+    key?: string;
+    peerId?: string;
 }

@@ -1,7 +1,6 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
-using Rx.Http;
 using Rx.Http.Extensions;
+using Rx.Http.Logging;
 
 namespace Lavyn.Business.Consumers
 {
@@ -9,14 +8,10 @@ namespace Lavyn.Business.Consumers
     {
         public static IServiceCollection AddConsumers(this IServiceCollection services)
         {
-            services.AddHttpClient<RxHttpClient>();
-            services.AddRxHttpLogging<RxHttpDefaultLogging>();
-            
-            services.AddConsumer<FirebaseMessagingConsumer>(http =>
-            {
-                http.BaseAddress = new Uri(@"https://fcm.googleapis.com/");
-            });
-            
+            services.UseRxHttp();
+            services.AddRxHttpLogger<RxHttpDefaultLogger>();
+            services.AddTransient<FirebaseMessagingConsumer>();
+
             return services;
         }
     }

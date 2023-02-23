@@ -1,10 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import Peer from 'peerjs';
+import Peer, { MediaConnection } from 'peerjs';
 import { CallService } from 'src/app/services/call.service';
 import { EnterCall } from 'src/app/models/enter-call';
 import { zip } from 'rxjs';
-import { Stream } from 'stream';
 import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
@@ -14,9 +13,9 @@ import { ChatService } from 'src/app/services/chat.service';
 })
 export class CallComponent implements OnInit, OnDestroy {
 
-  callId: string = "";
-  peer: Peer;
-  myStream: MediaStream;
+  callId?: string = "";
+  peer?: Peer;
+  myStream?: MediaStream;
   participants: Participant[] = [];
 
   constructor(
@@ -27,14 +26,15 @@ export class CallComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.callService.disconect();
-    this.peer.disconnect();
-    this.myStream.getTracks().forEach(track => track.stop());  
+    this.peer?.disconnect();
+    this.myStream?.getTracks().forEach(track => track.stop());  
   }
   
   ngOnInit(): void {
 
     let myVideoElem = document.querySelector('#js-video-myself') as HTMLVideoElement;
-    navigator.getUserMedia({video: true}, stream => {
+
+    navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
       myVideoElem.srcObject = stream;
       myVideoElem.play();
       this.myStream = stream;
@@ -45,7 +45,7 @@ export class CallComponent implements OnInit, OnDestroy {
       zip(this.route.paramMap, this.callService.onConnected())
         .subscribe(result => {
           const params = result[0];
-          this.callId = params.get('id');
+          this.callId = params.get('id')!;
           this.peer = new Peer();
           
           this.peer.on("open", (id) => {
@@ -56,7 +56,7 @@ export class CallComponent implements OnInit, OnDestroy {
   
             this.callService.enter(enterCall).subscribe(connectedIds => {
               connectedIds.forEach(id => {
-                const call = this.peer.call(id, this.myStream);
+                const call = this.peer!.call(id, this.myStream!);
                 call.on("stream", stream => this.addParticipant(call.peer, stream));
               });
             });
@@ -100,7 +100,7 @@ export class CallComponent implements OnInit, OnDestroy {
 }
 
 export class Participant {
-  id: string;
-  stream: MediaStream;
-  call: Peer.MediaConnection;
+  id?: string;
+  stream?: MediaStream;
+  call?: MediaConnection;
 }

@@ -8,7 +8,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader}  from '@ngx-translate/http-loader';
-import { NgxErrorsModule } from '@hackages/ngxerrors';
+import { NgxErrorsModule } from '@ngspot/ngx-errors';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { GravatarModule } from  'ngx-gravatar';

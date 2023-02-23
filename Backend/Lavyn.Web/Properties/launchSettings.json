@@ -21,7 +21,7 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:5000/swagger"
     },
-    "Default.Architecture": {
+    "Lavyn": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

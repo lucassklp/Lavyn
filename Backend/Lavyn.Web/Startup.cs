@@ -102,6 +102,9 @@ namespace Lavyn.Web
                 app.UseCors("DevelopmentPolicy");
             }
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseAuthorization();
             app.UseAuthentication();
             

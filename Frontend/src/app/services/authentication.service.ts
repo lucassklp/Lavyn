@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as jwt_decode from 'jwt-decode';
+import jwt_decode from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ export class AuthenticationService {
   }
 
   public get token(): string {
-    return sessionStorage.getItem('token')
+    return sessionStorage.getItem('token')!
   }
 
   public get isAuthenticated(): boolean {
