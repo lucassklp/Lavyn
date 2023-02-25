@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Lavyn.Business;
 using Lavyn.Domain.Dtos;
 using Lavyn.Domain.Entities;
-using Lavyn.Domain.Entities.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 

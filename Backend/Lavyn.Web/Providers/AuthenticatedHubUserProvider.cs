@@ -1,5 +1,4 @@
 using System;
-using Lavyn.Business;
 using Lavyn.Domain.Entities;
 using Lavyn.Persistence.Repository;
 using Microsoft.AspNetCore.SignalR;

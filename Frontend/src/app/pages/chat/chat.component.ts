@@ -6,7 +6,6 @@ import { Room } from 'src/app/models/room';
 import { UserInRoom } from 'src/app/models/user-in-room';
 import { Message } from 'src/app/models/message';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Call, CallType } from 'src/app/models/call';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -29,13 +28,13 @@ export class ChatComponent implements OnInit, OnDestroy {
   onCalledSubscription?: Subscription;
   roomSubscription?: Subscription;
 
+  private modalService: any = {};
 
   constructor(
     private chatService: ChatService,
     private change: ChangeDetectorRef,
     private fb: FormBuilder,
     private authService: AuthenticationService,
-    private modalService: NgbModal,
     private route: Router
   ) {
     this.form = fb.group({

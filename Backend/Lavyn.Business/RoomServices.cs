@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Auto.Mapping.DependencyInjection;
-using Lavyn.Business.Exceptions;
 using Lavyn.Domain.Dtos;
 using Lavyn.Domain.Entities;
 using Lavyn.Persistence.Repository;

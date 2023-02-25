@@ -1,6 +1,3 @@
-using System;
-using Lavyn.Business.Consumers;
-using Lavyn.Domain.Dtos;
 using Lavyn.Domain.Entities;
 using Lavyn.Persistence.Repository;
 

@@ -10,8 +10,9 @@ namespace Lavyn.Business.Consumers
 {
     public class FirebaseMessagingConsumer : RxHttpClient
     {
-        public FirebaseMessagingConsumer(HttpClient client, IConfiguration configuration): base(client, null)
+        public FirebaseMessagingConsumer(HttpClient http, IConfiguration configuration): base(http, null)
         {
+            http.BaseAddress = new Uri(@"https://fcm.googleapis.com/");
             RequestInterceptors.Add(new FirebaseMessagingInterceptor(configuration));
         }
 

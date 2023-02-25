@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Lavyn.Middlewares;
 using FluentValidation.AspNetCore;
-using Lavyn.Domain.Entities;
 using Lavyn.Web.Authentication.Jwt;
 using Lavyn.Web.Hubs;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
+using System;
 
 namespace Lavyn.Web
 {
@@ -29,6 +29,9 @@ namespace Lavyn.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+
             //Adding controllers for .NET Core 3.1
             services.AddControllers();
             

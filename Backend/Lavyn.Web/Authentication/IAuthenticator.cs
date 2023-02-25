@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Lavyn.Web.Authentication
+﻿namespace Lavyn.Web.Authentication
 {
     public interface IAuthenticator<T> where T : class
     {

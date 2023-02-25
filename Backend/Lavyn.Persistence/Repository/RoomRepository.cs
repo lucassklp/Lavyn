@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Lavyn.Domain.Entities;
-using Lavyn.Domain.Entities.Enums;
 using System.Linq;
-using System;
 using System.Collections.Generic;
-using Lavyn.Domain.Dtos;
 
 namespace Lavyn.Persistence.Repository
 {

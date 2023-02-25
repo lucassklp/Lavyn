@@ -12,7 +12,7 @@ export abstract class SignalRService {
 
   protected connectTo(channel: string): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`http://localhost:5010/${channel}`, {
+      .withUrl(`http://localhost:5000/${channel}`, {
         accessTokenFactory: () => this.authService.token
       })
       .build();

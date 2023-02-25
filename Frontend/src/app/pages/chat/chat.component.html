@@ -1,8 +1,8 @@
 <app-menu></app-menu>
 
-<div class="container">
-    <div class="row">
-        <div class="col-4">
+<div>
+    <div>
+        <div>
             <ul class="list-group chats">
                 <li class="list-group-item room-block" *ngFor="let room of getRooms()" (click)="selectRoom(room)">
                     <div class="float-left">
@@ -17,7 +17,8 @@
                 </li>
             </ul>
         </div>
-            badge-warning 
+
+
         <div class="col-8">
             <ul *ngIf="selectedRoom">
                 <li *ngFor="let message of selectedRoom.messages">
@@ -43,4 +44,4 @@
         <button type="button" class="btn btn-success" (click)="modal.close(true)">Join</button>
         <button type="button" class="btn btn-danger" (click)="modal.close(false)">Refuse</button>
     </div>
-0 q  
+</ng-template>

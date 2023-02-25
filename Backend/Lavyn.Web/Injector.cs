@@ -1,6 +1,5 @@
 ﻿using Lavyn.Domain;
 using Lavyn.Business;
-using Lavyn.Domain.Entities;
 using Lavyn.Web.Authentication;
 using Lavyn.Web.Authentication.Jwt;
 using Microsoft.AspNetCore.Http;
